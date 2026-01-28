@@ -111,6 +111,10 @@ See [plugins/recon/README.md](plugins/recon/README.md) for detailed documentatio
 - Output is curated prose, not data dumps
 - Single markdown file = predictable token cost
 
+## Acknowledgments
+
+Recon is based on [Cartographer](https://github.com/kingbootoshi/cartographer) by [@kingbootoshi](https://github.com/kingbootoshi). The v2 scanner and health intelligence features build on his original vision for AI-powered codebase mapping.
+
 ## License
 
 MIT
