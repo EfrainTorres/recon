@@ -25,7 +25,7 @@ AI-powered codebase mapping with parallel subagents. Produces architecture docum
 /recon
 ```
 
-Or say "map this codebase" — it triggers automatically.
+Or say "recon my project" — it triggers automatically.
 
 For a full re-scan: `/recon --force`
 
@@ -55,7 +55,7 @@ chmod +x scripts/scan-codebase.py
 /recon
 ```
 
-Or say "map this codebase".
+Or say "recon my project".
 
 **Requirements:** Cursor 2.4+, Python 3.9+, tiktoken
 
@@ -69,7 +69,7 @@ Or say "map this codebase".
 
 Recon orchestrates multiple subagents to analyze your codebase in parallel, then synthesizes their findings into:
 
-- **`docs/CODEBASE_MAP.md`** — Comprehensive codebase documentation:
+- **`docs/RECON_REPORT.md`** — Comprehensive codebase documentation:
   - Architecture map with file purposes, dependencies, data flows
   - Entrypoints — where execution begins
   - Config surface — all configuration files by category

@@ -6,7 +6,7 @@ A Claude Code plugin that maps and documents codebases of any size using paralle
 
 Recon orchestrates multiple Sonnet subagents to analyze your entire codebase in parallel, then synthesizes their findings with scanner metadata into comprehensive documentation:
 
-- `docs/CODEBASE_MAP.md` - Architecture map with:
+- `docs/RECON_REPORT.md` - Architecture map with:
   - File purposes, dependencies, data flows
   - **Entrypoints** and **config surface**
   - **Health summary**: hotspots, staleness, duplication, cleanup candidates
@@ -59,8 +59,8 @@ Simply invoke the skill:
 ```
 
 Or say:
-- "map this codebase"
-- "create codebase map"
+- "recon my project"
+- "scan my project"
 - "document the architecture"
 - "understand this codebase"
 
@@ -76,7 +76,7 @@ Or say: "remap everything", "full recon scan"
 
 ### Update Mode
 
-If `docs/CODEBASE_MAP.md` already exists, Recon will:
+If `docs/RECON_REPORT.md` already exists, Recon will:
 
 1. Check git history for changes since last mapping
 2. Only re-analyze changed modules
@@ -136,14 +136,14 @@ Just run `/recon` again to update.
         |
         v
 +---------------------------------------+
-|  5. Write docs/CODEBASE_MAP.md        |
+|  5. Write docs/RECON_REPORT.md        |
 |     Update CLAUDE.md with summary     |
 +---------------------------------------+
 ```
 
 ## Output Structure
 
-The generated `docs/CODEBASE_MAP.md` includes:
+The generated `docs/RECON_REPORT.md` includes:
 
 ### Structural Documentation
 - **System Overview** - Mermaid architecture diagram

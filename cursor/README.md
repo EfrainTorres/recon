@@ -58,8 +58,8 @@ In Cursor, invoke the recon subagent:
 ```
 
 Or use natural language:
-- "map this codebase"
-- "create codebase map"
+- "recon my project"
+- "scan my project"
 - "document the architecture"
 - "understand this codebase"
 
@@ -75,11 +75,11 @@ Recon orchestrates multiple analyzer subagents to map your codebase in parallel:
 1. **Scans** - Runs the Python scanner for file tree, token counts, git stats, entrypoints
 2. **Plans** - Splits work across subagents based on token budgets (~150k each)
 3. **Analyzes** - Spawns `recon-analyzer` subagents in parallel to read code
-4. **Synthesizes** - Combines reports into `docs/CODEBASE_MAP.md`
+4. **Synthesizes** - Combines reports into `docs/RECON_REPORT.md`
 
 ### Output
 
-- `docs/CODEBASE_MAP.md` - Comprehensive codebase documentation:
+- `docs/RECON_REPORT.md` - Comprehensive codebase documentation:
   - Architecture diagram
   - Entrypoints and config surface
   - Module guide with file purposes
@@ -102,7 +102,7 @@ recon (orchestrator)
                         synthesize ←──────┘
                             │
                             ▼
-                   CODEBASE_MAP.md
+                   RECON_REPORT.md
 ```
 
 The orchestrator (`recon.md`) uses the Task tool to spawn multiple `recon-analyzer` instances. Since custom subagents inherit the Task tool, this nested orchestration works natively in Cursor.
