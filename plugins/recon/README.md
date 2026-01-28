@@ -9,6 +9,8 @@ Recon orchestrates multiple Sonnet subagents to analyze your entire codebase in 
 - `docs/RECON_REPORT.md` - Architecture map with:
   - File purposes, dependencies, data flows
   - **Entrypoints** and **config surface**
+  - **Environment surface** and **API surface** (v2.1)
+  - **Test coverage** detection (v2.1)
   - **Health summary**: hotspots, staleness, duplication, cleanup candidates
   - **Suggested first actions** (top 5 priorities)
 - Updates `CLAUDE.md` with a summary pointing to the map
@@ -113,11 +115,15 @@ Just run `/recon` again to update.
 |  3. Spawn Sonnet subagents PARALLEL   |
 |     - Standard analysis (purpose,     |
 |       exports, patterns, gotchas)     |
-|     - Health observations:            |
+|     - Health observations (v2.1):     |
+|       * Environment & API surface     |
+|       * Test coverage (colocated)     |
+|       * Dependency flow               |
 |       * Unused code candidates        |
 |       * Complexity hotspots           |
 |       * Duplication patterns          |
 |       * Coupling concerns             |
+|       * Inconsistencies               |
 +---------------------------------------+
         |
         v
@@ -145,6 +151,9 @@ The generated `docs/RECON_REPORT.md` includes:
 - **System Overview** - Mermaid architecture diagram
 - **Entrypoints** - Where execution begins (from configs and conventions)
 - **Config Surface** - Configuration files by category
+- **Environment Surface** - Environment variables and their usage (v2.1)
+- **API Surface** - HTTP endpoints, CLI commands (v2.1)
+- **Test Coverage** - Colocated test detection (v2.1)
 - **Directory Structure** - Annotated file tree (source vs generated)
 - **Module Guide** - Per-module documentation with exports, dependencies
 - **Data Flow** - Sequence diagrams for key flows
@@ -152,7 +161,10 @@ The generated `docs/RECON_REPORT.md` includes:
 - **Gotchas** - Non-obvious behaviors and warnings
 - **Navigation Guide** - How to add features, modify systems
 
-### Health Intelligence (New in v2)
+### Health Intelligence (Enhanced in v2.1)
+- **Environment Surface** - All environment variables and config dependencies
+- **API Surface** - HTTP endpoints, CLI commands, public library exports
+- **Test Coverage** - Colocated test file detection with module coverage
 - **Hotspots** - High-churn files + complexity observations
 - **Staleness** - Files/directories not touched in 6+ months
 - **Knowledge Risk** - Single-author files in critical paths
@@ -160,7 +172,10 @@ The generated `docs/RECON_REPORT.md` includes:
 - **Duplication** - Exact duplicates (hash) + semantic duplicates (subagent)
 - **Cleanup Candidates** - Unused files/exports with confidence levels
 - **Complexity** - Large files, nested logic, TODO/FIXME density
+- **Inconsistencies** - Mixed patterns within modules
 - **Suggested First Actions** - Top 5 prioritized recommendations
+
+**Security:** Never outputs credential values — reports key names only.
 
 ## Scanner CLI Options
 

@@ -85,6 +85,9 @@ Recon orchestrates multiple subagents to analyze your codebase in parallel, then
   - Architecture map with file purposes, dependencies, data flows
   - Entrypoints — where execution begins
   - Config surface — all configuration files by category
+  - Environment surface — all env vars and their usage (v2.1)
+  - API surface — HTTP endpoints, CLI commands (v2.1)
+  - Test coverage — colocated test detection (v2.1)
   - Health summary — hotspots, staleness, duplication, complexity
   - Suggested first actions — top 5 priorities for improvement
 - Updates `CLAUDE.md` with a summary pointing to the map
@@ -96,7 +99,7 @@ Recon orchestrates multiple subagents to analyze your codebase in parallel, then
 3. **Analyze** — Spawns subagents in parallel with enhanced observation prompts
 4. **Synthesize** — Combines subagent reports + scanner metadata into documentation
 
-## Features (v2)
+## Features (v2.1)
 
 **Scanner Intelligence:**
 - Git-powered analysis: churn hotspots, staleness detection, co-change coupling
@@ -106,10 +109,19 @@ Recon orchestrates multiple subagents to analyze your codebase in parallel, then
 - Generated code detection (excluded from health signals)
 - TODO/FIXME counting and distribution
 
-**Health Observations:**
-- Subagents actively look for unused code, complexity issues, duplication patterns
-- Evidence-based confidence levels for cleanup recommendations
-- Coverage tracking (what was actually analyzed)
+**Enhanced Health Observations (v2.1):**
+- **Environment Surface** — all environment variables and config dependencies
+- **API Surface** — HTTP endpoints, CLI commands, public exports
+- **Test Coverage** — colocated test file detection
+- **Dependency Flow** — import/export relationships between files
+- Unused code candidates with evidence-based confidence levels
+- Complexity issues with specific examples
+- Inconsistency detection within modules
+- "Skip if n/a" approach — no empty sections, no wasted tokens
+
+**Security:**
+- Never outputs credential values (API keys, tokens, passwords)
+- Reports key names only (e.g., "JWT_SECRET used in auth.ts")
 
 **Actionable Output:**
 - Health Summary section with prioritized findings

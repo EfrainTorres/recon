@@ -82,6 +82,8 @@ Recon orchestrates multiple analyzer subagents to map your codebase in parallel:
 - `docs/RECON_REPORT.md` - Comprehensive codebase documentation:
   - Architecture diagram
   - Entrypoints and config surface
+  - Environment surface and API surface (v2.1)
+  - Test coverage detection (v2.1)
   - Module guide with file purposes
   - Health summary (hotspots, staleness, duplication, complexity)
   - Suggested first actions

@@ -14,115 +14,133 @@ Read and analyze all files assigned to you. Return a detailed analysis that will
 
 ## Analysis Instructions
 
-For each file, document:
-
-### Standard Analysis
-
-1. **Purpose**: One-line description of what this file does
-2. **Exports**: Key functions, classes, types, or constants exported
-3. **Imports**: Notable dependencies (both internal and external)
-4. **Patterns**: Design patterns or conventions used
-5. **Gotchas**: Non-obvious behavior, edge cases, warnings, or things that might surprise someone
-
-Also identify:
-- How these files connect to each other
-- Entry points and data flow within this module
-- Any configuration or environment dependencies
-
-### Health Observations (IMPORTANT)
-
-While analyzing, actively look for and report these issues:
-
-#### Unused Code Candidates
-
-Flag any files or exports that appear unused or orphaned. For each claim:
-- **What you observed** (the file/export)
-- **Where you looked** (which modules you checked for references)
-- **Counterevidence checked** (configs, entry points)
-
-Example format:
-> **Observation:** `src/legacy/old-worker.ts` appears unused
-> **Where I looked:** No imports found in src/api/, src/components/, src/utils/
-> **Counterevidence:** Not in package.json scripts, not in Dockerfile
-
-#### Complexity Hotspots
-
-Identify complexity issues. Be specific about what makes it complex:
-- Deeply nested conditionals
-- Functions doing too many things
-- Complex state management
-- Multiple responsibilities that should be split
-
-Example: "src/checkout/cart.ts has deeply nested discount logic with 4 levels of conditionals and multiple exit points"
-
-#### Duplication Patterns
-
-Note any files that appear to be duplicates or near-copies of other code you've analyzed:
-- Same structure
-- Same control flow
-- Same responsibilities
-- Copy-paste patterns
-
-Example: "UserService.ts and AdminService.ts follow identical patterns - consider shared base class"
-
-#### Coupling Observations
-
-Note any tight coupling between modules that might be problematic:
-- Circular dependencies
-- God objects that everything depends on
-- Modules that seem to know too much about each other
-
-## Output Format
-
-Return your analysis as structured markdown:
-
-```markdown
-# Module Analysis: [directory/module name]
-
-## Files Analyzed
-
-### [filename]
-
-**Purpose**: [one-line description]
-
-**Exports**:
-- `functionName()` - [description]
-- `ClassName` - [description]
-
-**Imports**:
-- Internal: [list internal dependencies]
-- External: [list external packages]
-
-**Patterns**: [patterns observed]
-
-**Gotchas**: [non-obvious behaviors]
+Read each file and provide analysis in two parts:
 
 ---
 
-[Repeat for each file]
+## Part 1: File Analysis
 
-## Module Connections
+For each file, document:
 
-[How files in this module connect to each other]
+### [filename]
 
-## Data Flow
+**Purpose**: One-line description of what this file does
 
-[Entry points and how data moves through this module]
+**Exports**: Key functions, classes, types, or constants exported
+- `exportName` - brief description
 
-## Health Observations
+**Imports**:
+- Internal: files from this codebase that this imports
+- External: packages/libraries used
+
+**Patterns**: Design patterns, conventions, or architectural approaches used
+
+**Gotchas**: Non-obvious behavior that might surprise someone:
+- Side effects (logging, metrics, global state mutation)
+- Implicit dependencies (init order, global config required)
+- Edge cases (null handling, timezone assumptions, silent failures)
+
+---
+
+## Part 2: Health Observations
+
+While analyzing, look for and report on the following.
+
+**IMPORTANT: Only include sections where you have actual observations.**
+- Skip sections entirely if they don't apply to this codebase
+- Skip sections if you found nothing noteworthy
+- Do NOT output empty sections or "None found" - just omit them
+
+**SECURITY: Never output credential values** (API keys, tokens, passwords, private keys).
+If credentials are found, output key names only (e.g., "JWT_SECRET is used in auth.ts" not the actual value).
+
+### Dependency Flow
+
+For the files you analyzed:
+- What internal files does each import?
+- What appears to import each file (from files you've seen)?
+- Any circular dependency patterns?
+
+Format:
+```
+file.ts
+  imports: [list of internal files]
+  imported by: [files you saw that import this]
+```
+
+### Test Coverage (colocated tests only)
+
+Note tests you can see in your assigned files:
+- Files with adjacent test files (*.test.ts, *.spec.ts, test_*.py, etc.)
+- Test files that import modules you analyzed
+
+You cannot assess tests in directories not assigned to you - only report what you can verify.
+
+### Environment & Configuration
+
+- Environment variables referenced (e.g., process.env.X, os.environ, etc.)
+- Config files depended on
+- External services or APIs called
+- Hardcoded values that should probably be configurable
+
+### API Surface
+
+- HTTP routes/endpoints defined (method, path, handler)
+- CLI commands defined
+- Public library exports (if this is a library)
+- WebSocket or event handlers
 
 ### Unused Code Candidates
-[List any unused code found with evidence]
+
+Flag files or exports that appear unused. For each:
+- **What**: the file or export
+- **Evidence**: where you looked for references
+- **Confidence**: high/medium/low
+
+Note: Dynamic imports, reflection, plugin registries, and framework conventions (auto-routing, dependency injection) cannot be statically detected. Mark confidence accordingly.
+
+Example:
+> `src/legacy/oldHelper.ts` - no imports found in analyzed files, not referenced in configs. Confidence: medium.
 
 ### Complexity Issues
-[List complexity hotspots with specifics]
+
+- Deeply nested conditionals (3+ levels)
+- Functions doing too many things
+- Files that are unusually large or dense
+- Complex state management
+
+Be specific: "calculateDiscount() has 4 levels of nesting with multiple early returns"
 
 ### Duplication Patterns
-[List semantic duplicates observed]
+
+- Files that are near-copies of each other
+- Repeated code patterns that could be abstracted
+- Similar implementations that should share logic
 
 ### Coupling Concerns
-[List tight coupling issues]
-```
+
+- Files that know too much about each other
+- God objects that everything depends on
+- Modules with unclear boundaries
+
+### Inconsistencies
+
+Note inconsistencies **within your assigned files only**:
+- Mixed patterns (e.g., some files use hooks, others use classes)
+- Inconsistent naming conventions
+- Different approaches to the same problem
+
+You cannot assess cross-module inconsistencies for files not assigned to you. Only report what you can verify within your assigned files.
+
+Be specific: "userController.ts uses async/await, but orderController.ts uses callbacks"
+
+---
+
+## Output Format
+
+Return your analysis as clean markdown with clear headers. Be thorough but concise - focus on what matters for understanding and maintaining this code.
+
+For health observations, always provide evidence for your claims. Don't just say "appears unused" - say where you looked.
 
 ## Important Notes
 
@@ -131,3 +149,4 @@ Return your analysis as structured markdown:
 - **Support your health observations with evidence** - don't just claim something is unused, explain where you looked
 - **Note uncertainty** - if you're not sure about something, say so
 - **Focus on your assigned files** - don't try to analyze the entire codebase
+- **Skip empty sections** - if you have no observations for a category, omit it entirely

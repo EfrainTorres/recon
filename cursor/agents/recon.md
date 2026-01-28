@@ -161,7 +161,8 @@ Create `docs/RECON_REPORT.md` using this structure:
 ```markdown
 ---
 last_mapped: YYYY-MM-DDTHH:MM:SSZ
-scanner_version: 2.0.0
+scanner_version: 2.0.1
+report_version: 2.1.0
 total_files: N
 total_tokens: N
 coverage:
@@ -194,6 +195,49 @@ coverage:
 | TypeScript | `tsconfig.json` |
 
 [Populated from scanner config_surface]
+
+## Environment Surface
+
+> Aggregated from subagent observations across analyzed files.
+
+| Variable | Used In | Required |
+|----------|---------|----------|
+| DATABASE_URL | db/connection.ts | Yes |
+| JWT_SECRET | middleware/auth.ts | Yes |
+| SMTP_HOST | utils/email.ts | Optional |
+
+[Populated from subagent environment observations]
+
+## API Surface
+
+### HTTP Endpoints
+
+| Method | Path | Handler | Auth |
+|--------|------|---------|------|
+| GET | /users | routes/users.ts | Yes |
+| POST | /users | routes/users.ts | No |
+
+[Populated from subagent API observations]
+
+### CLI Commands
+
+| Command | Handler | Description |
+|---------|---------|-------------|
+| migrate | scripts/migrate.ts | Run DB migrations |
+
+[If applicable - populated from subagent observations]
+
+## Test Coverage (Colocated)
+
+> Based on test files adjacent to source files. Tests in separate directories may not be detected.
+
+| Module | Colocated Tests | Notes |
+|--------|-----------------|-------|
+| api/routes | Yes | Good coverage of CRUD endpoints |
+| services | Partial | userService tested, orderService missing |
+| utils | None detected | May have tests in tests/ directory |
+
+[Populated from subagent test observations - only report what subagents can verify in their assigned files]
 
 ## Directory Structure
 

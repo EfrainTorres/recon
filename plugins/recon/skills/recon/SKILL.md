@@ -114,69 +114,145 @@ Use the Task tool with `subagent_type: "Explore"` and `model: "sonnet"` for each
 
 Each subagent prompt should include **standard analysis** plus **health observations**:
 
-**Enhanced subagent prompt template:**
+**Enhanced subagent prompt template (v2.1):**
 
 ```
-You are mapping part of a codebase. Read and analyze these files:
+You are analyzing part of a codebase for documentation and health assessment.
+
+## Files to Analyze
+
 - src/api/routes.ts
 - src/api/middleware/auth.ts
 - src/api/middleware/rateLimit.ts
 [... list all files in this group]
 
-## Standard Analysis
+## Instructions
+
+Read each file and provide analysis in two parts:
+
+---
+
+## Part 1: File Analysis
 
 For each file, document:
-1. **Purpose**: One-line description
-2. **Exports**: Key functions, classes, types exported
-3. **Imports**: Notable dependencies
-4. **Patterns**: Design patterns or conventions used
-5. **Gotchas**: Non-obvious behavior, edge cases, warnings
 
-Also identify:
-- How these files connect to each other
-- Entry points and data flow
-- Any configuration or environment dependencies
+### [filename]
 
-## Health Observations (IMPORTANT)
+**Purpose**: One-line description of what this file does
 
-While analyzing, actively look for and report:
+**Exports**: Key functions, classes, types, or constants exported
+- `exportName` - brief description
+
+**Imports**:
+- Internal: files from this codebase that this imports
+- External: packages/libraries used
+
+**Patterns**: Design patterns, conventions, or architectural approaches used
+
+**Gotchas**: Non-obvious behavior that might surprise someone:
+- Side effects (logging, metrics, global state mutation)
+- Implicit dependencies (init order, global config required)
+- Edge cases (null handling, timezone assumptions, silent failures)
+
+---
+
+## Part 2: Health Observations
+
+While analyzing, look for and report on the following.
+
+**IMPORTANT: Only include sections where you have actual observations.**
+- Skip sections entirely if they don't apply to this codebase
+- Skip sections if you found nothing noteworthy
+- Do NOT output empty sections or "None found" - just omit them
+
+**SECURITY: Never output credential values** (API keys, tokens, passwords, private keys).
+If credentials are found, output key names only (e.g., "JWT_SECRET is used in auth.ts" not the actual value).
+
+### Dependency Flow
+
+For the files you analyzed:
+- What internal files does each import?
+- What appears to import each file (from files you've seen)?
+- Any circular dependency patterns?
+
+Format:
+file.ts
+  imports: [list of internal files]
+  imported by: [files you saw that import this]
+
+### Test Coverage (colocated tests only)
+
+Note tests you can see in your assigned files:
+- Files with adjacent test files (*.test.ts, *.spec.ts, test_*.py, etc.)
+- Test files that import modules you analyzed
+
+You cannot assess tests in directories not assigned to you - only report what you can verify.
+
+### Environment & Configuration
+
+- Environment variables referenced (e.g., process.env.X, os.environ, etc.)
+- Config files depended on
+- External services or APIs called
+- Hardcoded values that should probably be configurable
+
+### API Surface
+
+- HTTP routes/endpoints defined (method, path, handler)
+- CLI commands defined
+- Public library exports (if this is a library)
+- WebSocket or event handlers
 
 ### Unused Code Candidates
-Flag any files or exports that appear unused or orphaned. For each claim:
-- **What you observed** (the file/export)
-- **Where you looked** (which modules you checked for references)
-- **Counterevidence checked** (configs, entry points)
 
-Example format:
-> **Observation:** `src/legacy/old-worker.ts` appears unused
-> **Where I looked:** No imports found in src/api/, src/components/, src/utils/
-> **Counterevidence:** Not in package.json scripts, not in Dockerfile
+Flag files or exports that appear unused. For each:
+- **What**: the file or export
+- **Evidence**: where you looked for references
+- **Confidence**: high/medium/low
 
-### Complexity Hotspots
-Identify complexity issues. Be specific about what makes it complex:
-- Deeply nested conditionals
+Note: Dynamic imports, reflection, plugin registries, and framework conventions (auto-routing, dependency injection) cannot be statically detected. Mark confidence accordingly.
+
+Example:
+> `src/legacy/oldHelper.ts` - no imports found in analyzed files, not referenced in configs. Confidence: medium.
+
+### Complexity Issues
+
+- Deeply nested conditionals (3+ levels)
 - Functions doing too many things
+- Files that are unusually large or dense
 - Complex state management
-- Multiple responsibilities that should be split
 
-Example: "src/checkout/cart.ts has deeply nested discount logic with 4 levels of conditionals and multiple exit points"
+Be specific: "calculateDiscount() has 4 levels of nesting with multiple early returns"
 
 ### Duplication Patterns
-Note any files that appear to be duplicates or near-copies of other code you've analyzed:
-- Same structure
-- Same control flow
-- Same responsibilities
-- Copy-paste patterns
 
-Example: "UserService.ts and AdminService.ts follow identical patterns - consider shared base class"
+- Files that are near-copies of each other
+- Repeated code patterns that could be abstracted
+- Similar implementations that should share logic
 
-### Coupling Observations
-Note any tight coupling between modules that might be problematic:
-- Circular dependencies
+### Coupling Concerns
+
+- Files that know too much about each other
 - God objects that everything depends on
-- Modules that seem to know too much about each other
+- Modules with unclear boundaries
 
-Return your analysis as markdown with clear headers per file/module.
+### Inconsistencies
+
+Note inconsistencies **within your assigned files only**:
+- Mixed patterns (e.g., some files use hooks, others use classes)
+- Inconsistent naming conventions
+- Different approaches to the same problem
+
+You cannot assess cross-module inconsistencies for files not assigned to you. Only report what you can verify within your assigned files.
+
+Be specific: "userController.ts uses async/await, but orderController.ts uses callbacks"
+
+---
+
+## Output Format
+
+Return your analysis as clean markdown with clear headers. Be thorough but concise - focus on what matters for understanding and maintaining this code.
+
+For health observations, always provide evidence for your claims. Don't just say "appears unused" - say where you looked.
 ```
 
 ### Step 6: Synthesize Reports
@@ -206,7 +282,8 @@ Create `docs/RECON_REPORT.md` using this structure:
 ```markdown
 ---
 last_mapped: YYYY-MM-DDTHH:MM:SSZ
-scanner_version: 2.0.0
+scanner_version: 2.0.1
+report_version: 2.1.0
 total_files: N
 total_tokens: N
 coverage:
@@ -266,6 +343,49 @@ graph TB
 | Env | `.env.example` |
 
 [Populated from scanner config_surface]
+
+## Environment Surface
+
+> Aggregated from subagent observations across analyzed files.
+
+| Variable | Used In | Required |
+|----------|---------|----------|
+| DATABASE_URL | db/connection.ts | Yes |
+| JWT_SECRET | middleware/auth.ts | Yes |
+| SMTP_HOST | utils/email.ts | Optional |
+
+[Populated from subagent environment observations]
+
+## API Surface
+
+### HTTP Endpoints
+
+| Method | Path | Handler | Auth |
+|--------|------|---------|------|
+| GET | /users | routes/users.ts | Yes |
+| POST | /users | routes/users.ts | No |
+
+[Populated from subagent API observations]
+
+### CLI Commands
+
+| Command | Handler | Description |
+|---------|---------|-------------|
+| migrate | scripts/migrate.ts | Run DB migrations |
+
+[If applicable - populated from subagent observations]
+
+## Test Coverage (Colocated)
+
+> Based on test files adjacent to source files. Tests in separate directories may not be detected.
+
+| Module | Colocated Tests | Notes |
+|--------|-----------------|-------|
+| api/routes | Yes | Good coverage of CRUD endpoints |
+| services | Partial | userService tested, orderService missing |
+| utils | None detected | May have tests in tests/ directory |
+
+[Populated from subagent test observations - only report what subagents can verify in their assigned files]
 
 ## Directory Structure
 
@@ -482,7 +602,7 @@ The v2 scanner returns JSON with these fields:
 ```json
 {
   "root": "/path/to/repo",
-  "scanner_version": "2.0.0",
+  "scanner_version": "2.0.1",
   "timestamp": "2024-01-15T10:30:00Z",
   "args": { /* CLI args used */ },
   "files": [
