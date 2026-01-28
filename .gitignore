@@ -1,0 +1,24 @@
+# Development/planning docs
+CARTOGRAPHER_V2_VISION.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# UV
+.uv/
