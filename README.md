@@ -2,6 +2,21 @@
 
 AI-powered codebase mapping with parallel subagents. Produces architecture documentation, health analysis, and actionable recommendations.
 
+## Why Recon?
+
+**The problem:** AI agents can't read large codebases without hitting context limits or burning tokens re-reading files every session.
+
+**The solution:** Recon splits your codebase across parallel subagents, each analyzing a portion simultaneously. The results merge into a single persistent map.
+
+**The payoff:**
+- **Scan once, reference forever.** Agents read the map instead of re-reading source files.
+- **Works at any scale.** 10 files or 10,000, the approach is the same.
+- **Actionable output.** Not just documentation, but health signals and priorities.
+
+One `/recon` command gives your AI agents permanent context about your codebase.
+
+---
+
 ## Platforms
 
 | Platform | Status | Installation |
@@ -25,7 +40,7 @@ AI-powered codebase mapping with parallel subagents. Produces architecture docum
 /recon
 ```
 
-Or say "recon my project" — it triggers automatically.
+Or say "recon my project" and it triggers automatically.
 
 For a full re-scan: `/recon --force`
 
@@ -81,23 +96,23 @@ We'll add Codex support once native subagents land. Track progress: [#2604](http
 
 Recon orchestrates multiple subagents to analyze your codebase in parallel, then synthesizes their findings into:
 
-- **`docs/RECON_REPORT.md`** — Comprehensive codebase documentation:
+- **`docs/RECON_REPORT.md`** with comprehensive codebase documentation:
   - Architecture map with file purposes, dependencies, data flows
-  - Entrypoints — where execution begins
-  - Config surface — all configuration files by category
-  - Environment surface — all env vars and their usage (v2.1)
-  - API surface — HTTP endpoints, CLI commands (v2.1)
-  - Test coverage — colocated test detection (v2.1)
-  - Health summary — hotspots, staleness, duplication, complexity
-  - Suggested first actions — top 5 priorities for improvement
+  - Entrypoints (where execution begins)
+  - Config surface (all configuration files by category)
+  - Environment surface and env var usage (v2.1)
+  - API surface with HTTP endpoints, CLI commands (v2.1)
+  - Test coverage with colocated test detection (v2.1)
+  - Health summary: hotspots, staleness, duplication, complexity
+  - Suggested first actions (top 5 priorities)
 - Updates `CLAUDE.md` with a summary pointing to the map
 
 ## How it Works
 
-1. **Scan** — Runs v2 scanner for file tree, token counts, git stats, entrypoints, duplicates
-2. **Plan** — Splits work across subagents based on token budgets (~150k each)
-3. **Analyze** — Spawns subagents in parallel with enhanced observation prompts
-4. **Synthesize** — Combines subagent reports + scanner metadata into documentation
+1. **Scan:** Runs v2 scanner for file tree, token counts, git stats, entrypoints, duplicates
+2. **Plan:** Splits work across subagents based on token budgets (~150k each)
+3. **Analyze:** Spawns subagents in parallel with enhanced observation prompts
+4. **Synthesize:** Combines subagent reports + scanner metadata into documentation
 
 ## Features (v2.1)
 
@@ -110,14 +125,14 @@ Recon orchestrates multiple subagents to analyze your codebase in parallel, then
 - TODO/FIXME counting and distribution
 
 **Enhanced Health Observations (v2.1):**
-- **Environment Surface** — all environment variables and config dependencies
-- **API Surface** — HTTP endpoints, CLI commands, public exports
-- **Test Coverage** — colocated test file detection
-- **Dependency Flow** — import/export relationships between files
+- **Environment Surface:** all environment variables and config dependencies
+- **API Surface:** HTTP endpoints, CLI commands, public exports
+- **Test Coverage:** colocated test file detection
+- **Dependency Flow:** import/export relationships between files
 - Unused code candidates with evidence-based confidence levels
 - Complexity issues with specific examples
 - Inconsistency detection within modules
-- "Skip if n/a" approach — no empty sections, no wasted tokens
+- "Skip if n/a" approach (no empty sections, no wasted tokens)
 
 **Security:**
 - Never outputs credential values (API keys, tokens, passwords)
