@@ -9,7 +9,8 @@ AI-powered codebase mapping with parallel subagents. Produces architecture docum
 **The solution:** Recon splits your codebase across parallel subagents, each analyzing a portion simultaneously. The results merge into a single persistent map.
 
 **The payoff:**
-- **Scan once, reference forever.** Agents read the map instead of re-reading source files.
+- **Persistent map.** Agents reference the map instead of re-reading source files every session.
+- **Incremental updates.** Re-runs detect changes and only re-analyze modified files.
 - **Works at any scale.** 10 files or 10,000, the approach is the same.
 - **Actionable output.** Not just documentation, but health signals and priorities.
 
