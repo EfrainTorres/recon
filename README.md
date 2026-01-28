@@ -59,9 +59,21 @@ Or say "recon my project".
 
 **Requirements:** Cursor 2.4+, Python 3.9+, tiktoken
 
-> ⚠️ **Known Issue:** Cursor 2.4.x/2.5 has a [bug](https://forum.cursor.com/t/task-tool-missing-for-custom-agents-in-cursor-agents-documentation-pages-return-errors/149771) preventing subagent spawning. Parallel analysis won't work until Cursor releases a fix. Use Claude Code for full functionality.
+> ⚠️ **Known Issue:** Cursor 2.4.x/2.5 has a [bug](https://forum.cursor.com/t/subagent-invocation-not-working-anymore-on-most-recent-nightly-and-early-access-builds/149987) preventing subagent spawning. Parallel analysis won't work until Cursor releases a fix. Use Claude Code for full functionality.
 
 📖 [Full Cursor documentation](cursor/README.md)
+
+---
+
+## Codex
+
+**Status:** Waiting on OpenAI
+
+Native subagent support in Codex is [still under development](https://github.com/openai/codex/issues/2604) and hasn't been released yet. A [community PR](https://github.com/openai/codex/pull/3655) implementing multi-agent orchestration was closed in Oct 2025 as OpenAI aligns contributions with internal roadmaps.
+
+Current workaround requires external orchestration via the [Agents SDK + MCP](https://developers.openai.com/codex/guides/agents-sdk/), which adds setup complexity that defeats the point of a simple `/recon` command.
+
+We'll add Codex support once native subagents land. Track progress: [#2604](https://github.com/openai/codex/issues/2604)
 
 ---
 
