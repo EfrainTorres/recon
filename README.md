@@ -119,4 +119,4 @@ Recon is based on [Cartographer](https://github.com/kingbootoshi/cartographer) b
 
 ## License
 
-MIT
+AGPL-3.0

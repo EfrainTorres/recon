@@ -47,7 +47,7 @@ except ImportError:
     print("Or install tiktoken manually: pip install tiktoken", file=sys.stderr)
     sys.exit(1)
 
-SCANNER_VERSION = "2.0.0"
+SCANNER_VERSION = "2.0.1"
 
 # Default patterns to always ignore (common non-code files)
 DEFAULT_IGNORE = {

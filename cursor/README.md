@@ -114,7 +114,7 @@ The orchestrator (`recon.md`) uses the Task tool to spawn multiple `recon-analyz
 | Installation | `/plugin install recon` | Copy files to `.cursor/agents/` |
 | Invocation | Skill auto-triggered | `/recon` or natural language |
 | Scanner path | `$CLAUDE_PLUGIN_ROOT/...` | `./scripts/scan-codebase.py` |
-| Subagent model | `model: "sonnet"` | `model: fast` (configurable) |
+| Subagent model | `model: "sonnet"` | `model: inherit` |
 
 The analysis logic, output format, and quality are identical.
 
@@ -161,4 +161,4 @@ There is a [known bug](https://forum.cursor.com/t/task-tool-missing-for-custom-a
 
 ## License
 
-MIT - Same license as the main Recon project.
+AGPL-3.0

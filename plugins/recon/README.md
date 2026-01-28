@@ -15,24 +15,20 @@ Recon orchestrates multiple Sonnet subagents to analyze your entire codebase in 
 
 ## Installation
 
-### Via Claude Code Plugins Registry
+### Via Claude Code Plugin Marketplace
 
-```bash
-claude plugins install recon
+```
+/plugin marketplace add EfrainTorres/recon
+/plugin install recon
 ```
 
-### Manual Installation
+### Manual Installation (Development)
 
-Clone to your Claude skills directory:
-
-```bash
-git clone https://github.com/EfrainTorres/recon.git ~/.claude/skills/recon
-```
-
-Or for project-specific use:
+Clone the repo and load with `--plugin-dir`:
 
 ```bash
-git clone https://github.com/EfrainTorres/recon.git .claude/skills/recon
+git clone https://github.com/EfrainTorres/recon.git ~/recon
+claude --plugin-dir ~/recon/plugins/recon
 ```
 
 ### Dependencies
@@ -219,4 +215,4 @@ The scanner respects `.gitignore` (including nested files and negation patterns)
 
 ## License
 
-MIT
+AGPL-3.0
