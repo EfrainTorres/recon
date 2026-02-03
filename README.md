@@ -104,6 +104,7 @@ Recon orchestrates multiple subagents to analyze your codebase in parallel, then
   - Environment surface and env var usage (v2.1)
   - API surface with HTTP endpoints, CLI commands (v2.1)
   - Test coverage with colocated test detection (v2.1)
+  - **Dependency graph: high impact files, circular dependencies, orphan candidates (v2.2)**
   - Health summary: hotspots, staleness, duplication, complexity
   - Suggested first actions (top 5 priorities)
 - Updates `CLAUDE.md` with a summary pointing to the map
@@ -115,7 +116,13 @@ Recon orchestrates multiple subagents to analyze your codebase in parallel, then
 3. **Analyze:** Spawns subagents in parallel with enhanced observation prompts
 4. **Synthesize:** Combines subagent reports + scanner metadata into documentation
 
-## Features (v2.1)
+## Features (v2.2)
+
+**Dependency Graph Intelligence (v2.2):**
+- **High Impact Files:** files with 5+ dependents flagged for careful changes
+- **Circular Dependencies:** import cycles detected and reported with cycle paths
+- **Orphan Candidates:** unused files identified (cross-referenced with entrypoints, tests, scripts)
+- Structured JSON extraction from subagents enables cross-module visibility
 
 **Scanner Intelligence:**
 - Git-powered analysis: churn hotspots, staleness detection, co-change coupling

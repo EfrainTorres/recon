@@ -136,6 +136,43 @@ Be specific: "userController.ts uses async/await, but orderController.ts uses ca
 
 ---
 
+## Part 3: Structured Facts
+
+Output a JSON block with machine-readable dependency data. This enables cross-module graph building.
+
+**Rules:**
+1. **Internal imports only** — Omit external packages (express, lodash, react, etc.)
+2. **Normalize paths** — Convert relative imports to repo-root-relative paths
+   - Example: If `src/api/routes/users.ts` imports `../middleware/auth`, output `src/middleware/auth.ts`
+3. **Include file extension** — Always include `.ts`, `.js`, `.py`, etc.
+4. **Only files you analyzed** — Don't guess about files outside your assignment
+
+```json
+{
+  "files": {
+    "src/api/routes/users.ts": {
+      "imports": ["src/middleware/auth.ts", "src/services/userService.ts", "src/db/models/user.ts"],
+      "exports": ["userRouter", "UserController"],
+      "env_vars": ["DATABASE_URL", "JWT_SECRET"],
+      "endpoints": [
+        {"method": "GET", "path": "/users"},
+        {"method": "POST", "path": "/users"},
+        {"method": "GET", "path": "/users/:id"}
+      ]
+    },
+    "src/middleware/auth.ts": {
+      "imports": ["src/utils/jwt.ts", "src/db/models/user.ts"],
+      "exports": ["authMiddleware", "requireAdmin"],
+      "env_vars": ["JWT_SECRET"]
+    }
+  }
+}
+```
+
+**If a field doesn't apply, omit it** (e.g., no endpoints for a utility file).
+
+---
+
 ## Output Format
 
 Return your analysis as clean markdown with clear headers. Be thorough but concise - focus on what matters for understanding and maintaining this code.

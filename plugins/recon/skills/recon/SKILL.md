@@ -114,7 +114,7 @@ Use the Task tool with `subagent_type: "Explore"` and `model: "sonnet"` for each
 
 Each subagent prompt should include **standard analysis** plus **health observations**:
 
-**Enhanced subagent prompt template (v2.1):**
+**Enhanced subagent prompt template (v2.2):**
 
 ```
 You are analyzing part of a codebase for documentation and health assessment.
@@ -248,6 +248,43 @@ Be specific: "userController.ts uses async/await, but orderController.ts uses ca
 
 ---
 
+## Part 3: Structured Facts
+
+Output a JSON block with machine-readable dependency data. This enables cross-module graph building.
+
+**Rules:**
+1. **Internal imports only** — Omit external packages (express, lodash, react, etc.)
+2. **Normalize paths** — Convert relative imports to repo-root-relative paths
+   - Example: If `src/api/routes/users.ts` imports `../middleware/auth`, output `src/middleware/auth.ts`
+3. **Include file extension** — Always include `.ts`, `.js`, `.py`, etc.
+4. **Only files you analyzed** — Don't guess about files outside your assignment
+
+```json
+{
+  "files": {
+    "src/api/routes/users.ts": {
+      "imports": ["src/middleware/auth.ts", "src/services/userService.ts", "src/db/models/user.ts"],
+      "exports": ["userRouter", "UserController"],
+      "env_vars": ["DATABASE_URL", "JWT_SECRET"],
+      "endpoints": [
+        {"method": "GET", "path": "/users"},
+        {"method": "POST", "path": "/users"},
+        {"method": "GET", "path": "/users/:id"}
+      ]
+    },
+    "src/middleware/auth.ts": {
+      "imports": ["src/utils/jwt.ts", "src/db/models/user.ts"],
+      "exports": ["authMiddleware", "requireAdmin"],
+      "env_vars": ["JWT_SECRET"]
+    }
+  }
+}
+```
+
+**If a field doesn't apply, omit it** (e.g., no endpoints for a utility file).
+
+---
+
 ## Output Format
 
 Return your analysis as clean markdown with clear headers. Be thorough but concise - focus on what matters for understanding and maintaining this code.
@@ -275,6 +312,31 @@ Report what was actually analyzed:
 - Tokens analyzed vs total
 - Excluded paths (generated, vendored, over budget)
 
+### Step 6b: Build Dependency Graph (v2.2)
+
+After collecting all subagent reports, build the dependency graph from Part 3 structured facts:
+
+1. **Extract Part 3 JSON** from each subagent output
+2. **Merge all files** into a single graph structure
+3. **Compute inverse relationships** (imported_by):
+   - For each file A that imports file B, add A to B's `imported_by` list
+4. **Detect circular dependencies**:
+   - Look for cycles: A → B → C → A
+   - Report the shortest cycle path for each
+5. **Compute impact scores**:
+   - Count `imported_by` length for each file
+   - Flag files with 5+ dependents as "high impact"
+6. **Identify orphan candidates**:
+   - Files with empty `imported_by` AND:
+     - NOT in scanner `entrypoints` list
+     - NOT matching test patterns (`*.test.*`, `*.spec.*`, `test_*.*`, `*_test.*`)
+     - NOT in `scripts/`, `bin/`, `tools/`, or `migrations/` directories
+     - NOT in scanner `config_surface`
+
+**Context budget note:** Part 3 JSON is compact (~1-2KB per subagent). Even with 30 subagents, total JSON is ~50K tokens — well within orchestrator context.
+
+**Error handling:** If a subagent's Part 3 JSON is malformed or missing, log the issue and continue with available data. Note partial coverage in the Dependency Graph section header (e.g., "Built from 4/5 subagents — 1 failed to produce structured data").
+
 ### Step 7: Write RECON_REPORT.md
 
 Create `docs/RECON_REPORT.md` using this structure:
@@ -283,7 +345,7 @@ Create `docs/RECON_REPORT.md` using this structure:
 ---
 last_mapped: YYYY-MM-DDTHH:MM:SSZ
 scanner_version: 2.0.1
-report_version: 2.1.0
+report_version: 2.2.0
 total_files: N
 total_tokens: N
 coverage:
@@ -410,6 +472,53 @@ graph TB
 **Dependents**: [what needs it]
 
 [Repeat for each module]
+
+## Dependency Graph
+
+> Built by merging structured facts from all analyzer subagents. Covers files that were analyzed; generated/vendored files excluded.
+
+### High Impact Files
+
+Files with 5+ dependents — changes here have wide blast radius.
+
+| File | Dependents | Imported By |
+|------|------------|-------------|
+| src/db/connection.ts | 12 | api/*, services/*, workers/* |
+| src/utils/logger.ts | 8 | Nearly everywhere |
+| src/middleware/auth.ts | 6 | All protected routes |
+
+[Computed from Part 3 structured facts - count imported_by for each file]
+
+*If no files have 5+ dependents, state: "No files with 5+ dependents."*
+
+### Circular Dependencies
+
+These import cycles may cause issues (initialization order, bundling, testing):
+
+```
+src/services/userService.ts
+  → src/services/emailService.ts
+  → src/services/userService.ts
+```
+
+[Detected by finding cycles in the import graph]
+
+*If no cycles found, state: "No circular dependencies detected."*
+
+### Orphan Candidates
+
+Files with no detected importers. Verify before removing — may be dynamically imported or used externally.
+
+| File | Confidence | Notes |
+|------|------------|-------|
+| src/legacy/oldWorker.ts | High | No imports, stale 2 years |
+| src/utils/deprecated.ts | Medium | No imports in analyzed files |
+
+**Excluded from orphan analysis:** Entrypoints, test files, scripts, migrations, config files.
+
+[Cross-reference empty imported_by with scanner entrypoints and exclusion patterns]
+
+*If no orphan candidates found, state: "No orphan candidates detected."*
 
 ## Data Flow
 

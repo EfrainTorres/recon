@@ -11,6 +11,7 @@ Recon orchestrates multiple Sonnet subagents to analyze your entire codebase in 
   - **Entrypoints** and **config surface**
   - **Environment surface** and **API surface** (v2.1)
   - **Test coverage** detection (v2.1)
+  - **Dependency graph**: high impact files, circular dependencies, orphan candidates (v2.2)
   - **Health summary**: hotspots, staleness, duplication, cleanup candidates
   - **Suggested first actions** (top 5 priorities)
 - Updates `CLAUDE.md` with a summary pointing to the map
@@ -161,7 +162,8 @@ The generated `docs/RECON_REPORT.md` includes:
 - **Gotchas** - Non-obvious behaviors and warnings
 - **Navigation Guide** - How to add features, modify systems
 
-### Health Intelligence (Enhanced in v2.1)
+### Health Intelligence (Enhanced in v2.2)
+- **Dependency Graph** - High impact files, circular dependencies, orphan candidates (v2.2)
 - **Environment Surface** - All environment variables and config dependencies
 - **API Surface** - HTTP endpoints, CLI commands, public library exports
 - **Test Coverage** - Colocated test file detection with module coverage

@@ -84,6 +84,7 @@ Recon orchestrates multiple analyzer subagents to map your codebase in parallel:
   - Entrypoints and config surface
   - Environment surface and API surface (v2.1)
   - Test coverage detection (v2.1)
+  - Dependency graph: high impact files, circular dependencies, orphan candidates (v2.2)
   - Module guide with file purposes
   - Health summary (hotspots, staleness, duplication, complexity)
   - Suggested first actions
