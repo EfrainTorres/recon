@@ -1,6 +1,6 @@
 ---
 name: recon
-description: Maps and documents codebases of any size by orchestrating parallel subagents. Creates docs/RECON_REPORT.md with architecture, health analysis, entrypoints, and actionable recommendations. Updates CLAUDE.md with a summary. Use when user says "recon my project", "recon", "/recon", "scan my project", "document the architecture", "understand this codebase", or when onboarding to a new project. Supports "--force" for full re-scan.
+description: Maps and documents codebases of any size by orchestrating parallel subagents. Creates docs/RECON_REPORT.md with architecture, health analysis, entrypoints, and actionable recommendations. Updates CLAUDE.md with a summary. Use when user says "recon my project", "recon", "/recon", "scan my project", "document the architecture", "understand this codebase", or when onboarding to a new project. Supports "--force" for full re-scan, "--opus" for Opus subagents.
 ---
 
 # Recon
@@ -20,10 +20,13 @@ Maps codebases of any size using parallel Sonnet subagents. Produces codebase in
 
 ## Workflow
 
-### Step 1: Check for Existing Map and Force Flag
+### Step 1: Check for Existing Map and Flags
 
-First, check if user requested a force re-scan:
-- "recon --force", "remap everything", "full recon scan" → Full re-map
+First, check for flags in the user's request:
+- `--force` → Full re-map (ignore existing report)
+- `--opus` → Use Opus model for subagents (higher quality, higher cost)
+
+**Default model is Sonnet** — use Opus only when explicitly requested.
 
 Then check if `docs/RECON_REPORT.md` already exists:
 
@@ -106,9 +109,13 @@ Subagent 3: src/lib/, src/utils/ (~100k tokens)
 Subagent 4: tests/, docs/ (~80k tokens)
 ```
 
-### Step 5: Spawn Sonnet Subagents in Parallel
+### Step 5: Spawn Subagents in Parallel
 
-Use the Task tool with `subagent_type: "Explore"` and `model: "sonnet"` for each group.
+Use the Task tool with `subagent_type: "Explore"` for each group.
+
+**Model selection:**
+- Default: `model: "sonnet"` (recommended for most codebases)
+- If `--opus` flag was provided: `model: "opus"` (higher quality analysis)
 
 **CRITICAL: Spawn all subagents in a SINGLE message with multiple Task tool calls.**
 
@@ -702,7 +709,7 @@ When updating an existing map:
 | Opus | 200,000 | 100,000 |
 | Haiku | 200,000 | 100,000 |
 
-Always use Sonnet subagents - best balance of capability and cost for file analysis.
+**Default: Sonnet** — best balance of capability and cost. Use `--opus` flag for higher quality analysis on complex/critical codebases.
 
 ## Scanner Output Reference
 
