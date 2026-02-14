@@ -1,20 +1,20 @@
 ---
 name: recon
-description: Maps and documents codebases of any size by orchestrating parallel subagents. Creates docs/RECON_REPORT.md with architecture, health analysis, entrypoints, and actionable recommendations. Updates CLAUDE.md with a summary. Use when user says "recon my project", "recon", "/recon", "scan my project", "document the architecture", "understand this codebase", or when onboarding to a new project. Supports "--force" for full re-scan, "--opus" for Opus subagents.
+description: Maps and documents codebases of any size by orchestrating parallel subagents. Creates docs/RECON_REPORT.md with architecture, health analysis, entrypoints, and actionable recommendations. Updates CLAUDE.md with a summary. Use when user says "recon my project", "recon", "/recon", "scan my project", "document the architecture", "understand this codebase", or when onboarding to a new project. Supports "--force" for full re-scan, "--opus" for Opus subagents (1M context), "--opus Nk" for custom budget (e.g. "--opus 500k").
 ---
 
 # Recon
 
-Maps codebases of any size using parallel Sonnet subagents. Produces codebase intelligence: structure, health signals, and actionable recommendations.
+Maps codebases of any size using parallel subagents. Produces codebase intelligence: structure, health signals, and actionable recommendations.
 
-**CRITICAL: Opus orchestrates, Sonnet reads.** Never have Opus read codebase files directly. Always delegate file reading to Sonnet subagents - even for small codebases. Opus plans the work, spawns subagents, and synthesizes their reports.
+**CRITICAL: Orchestrator never reads files directly.** Always delegate file reading to subagents - even for small codebases. The orchestrator plans the work, spawns subagents, and synthesizes their reports.
 
 ## Quick Start
 
 1. Run the scanner script to get comprehensive codebase metadata
 2. Analyze scanner output (entrypoints, config surface, git stats, duplicates)
 3. Plan subagent work assignments based on token budgets
-4. Spawn Sonnet subagents in parallel with enhanced observation prompts
+4. Spawn subagents in parallel with enhanced observation prompts
 5. Synthesize subagent reports + scanner metadata into `docs/RECON_REPORT.md`
 6. Update `CLAUDE.md` with summary pointing to the map
 
@@ -24,9 +24,12 @@ Maps codebases of any size using parallel Sonnet subagents. Produces codebase in
 
 First, check for flags in the user's request:
 - `--force` → Full re-map (ignore existing report)
-- `--opus` → Use Opus model for subagents (higher quality, higher cost)
+- `--opus` → Use Opus model for subagents (1M context, 750k default budget)
+- `--opus Nk` → Opus with custom budget (e.g. `--opus 500k`, `--opus 800k`)
 
 **Default model is Sonnet** — use Opus only when explicitly requested.
+
+**Budget parsing:** If a number like `500k` or `800k` follows `--opus`, use that as the per-subagent token budget. Otherwise default to 750,000.
 
 Then check if `docs/RECON_REPORT.md` already exists:
 
@@ -91,7 +94,9 @@ Before planning subagent work, extract key insights from scanner output:
 
 Divide work among subagents based on scanner output:
 
-**Token budget per subagent:** ~150,000 tokens (safe margin under Sonnet's 200k context limit)
+**Token budget per subagent:**
+- **Sonnet (default):** ~150,000 tokens (safe margin under 200k context)
+- **Opus (`--opus`):** ~750,000 tokens (safe margin under 1M context), or custom `--opus Nk` value
 
 **Grouping strategy:**
 1. Group files by directory/module (keeps related code together)
@@ -99,7 +104,9 @@ Divide work among subagents based on scanner output:
 3. Exclude generated files from detailed analysis
 4. Prioritize hotspot files for deeper analysis
 
-**For small codebases (<100k tokens):** Still use a single Sonnet subagent. Opus orchestrates, Sonnet reads.
+**For small codebases:** Still use a single subagent. Threshold depends on model:
+- Sonnet: <100k tokens → single subagent
+- Opus: <750k tokens (or custom budget) → single subagent
 
 **Example assignment:**
 ```
@@ -352,7 +359,7 @@ Create `docs/RECON_REPORT.md` using this structure:
 ---
 last_mapped: YYYY-MM-DDTHH:MM:SSZ
 scanner_version: 2.0.1
-report_version: 2.2.0
+report_version: 2.3.0
 total_files: N
 total_tokens: N
 coverage:
@@ -703,13 +710,13 @@ When updating an existing map:
 
 ## Token Budget Reference
 
-| Model | Context Window | Safe Budget per Subagent |
-|-------|---------------|-------------------------|
-| Sonnet | 200,000 | 150,000 |
-| Opus | 200,000 | 100,000 |
-| Haiku | 200,000 | 100,000 |
+| Model | Context Window | Default Budget per Subagent | Custom Budget |
+|-------|---------------|---------------------------|---------------|
+| Sonnet | 200,000 | 150,000 | — |
+| Opus | 1,000,000 | 750,000 | `--opus Nk` (e.g. `--opus 500k`) |
+| Haiku | 200,000 | 100,000 | — |
 
-**Default: Sonnet** — best balance of capability and cost. Use `--opus` flag for higher quality analysis on complex/critical codebases.
+**Default: Sonnet** — best balance of capability and cost. Use `--opus` flag for higher quality analysis on complex/critical codebases. Use `--opus Nk` to customize the per-subagent budget (e.g. `--opus 400k` for more subagents with smaller context, `--opus 800k` for fewer subagents with larger context).
 
 ## Scanner Output Reference
 

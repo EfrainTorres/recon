@@ -1,7 +1,7 @@
 {
   "name": "recon",
   "description": "Maps and documents codebases with health intelligence: architecture, entrypoints, hotspots, unused code detection, and actionable recommendations",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "author": {
     "name": "Efrain Torres",
     "url": "https://github.com/EfrainTorres"

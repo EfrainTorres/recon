@@ -4,7 +4,7 @@ A Claude Code plugin that maps and documents codebases of any size using paralle
 
 ## What it does
 
-Recon orchestrates multiple Sonnet subagents to analyze your entire codebase in parallel, then synthesizes their findings with scanner metadata into comprehensive documentation:
+Recon orchestrates multiple subagents to analyze your entire codebase in parallel, then synthesizes their findings with scanner metadata into comprehensive documentation:
 
 - `docs/RECON_REPORT.md` - Architecture map with:
   - File purposes, dependencies, data flows
@@ -73,6 +73,18 @@ To force a complete re-analysis (ignoring existing map):
 
 Or say: "remap everything", "full recon scan"
 
+### Opus Mode (1M Context)
+
+Use Opus subagents for higher quality analysis:
+
+```
+/recon --opus          # Opus subagents at 750k budget (default)
+/recon --opus 500k     # Opus subagents at 500k budget (more subagents)
+/recon --opus 800k     # Opus subagents at 800k budget (fewer subagents)
+```
+
+Combine with force: `/recon --force --opus 500k`
+
 ### Update Mode
 
 If `docs/RECON_REPORT.md` already exists, Recon will:
@@ -106,14 +118,15 @@ Just run `/recon` again to update.
 +---------------------------------------+
 |  2. Plan subagent assignments         |
 |     - Group files by module           |
-|     - Balance token budgets (~150k)   |
+|     - Balance token budgets            |
+|       (~150k Sonnet, ~750k Opus)      |
 |     - Prioritize hotspots             |
 |     - Exclude generated files         |
 +---------------------------------------+
         |
         v
 +---------------------------------------+
-|  3. Spawn Sonnet subagents PARALLEL   |
+|  3. Spawn subagents in PARALLEL       |
 |     - Standard analysis (purpose,     |
 |       exports, patterns, gotchas)     |
 |     - Health observations (v2.1):     |
@@ -204,13 +217,13 @@ uv run scan-codebase.py . --format compact # Sorted list
 
 ## Token Budgets
 
-| Model | Context Window | Budget per Subagent |
-|-------|---------------|---------------------|
-| Sonnet | 200,000 | 150,000 |
-| Opus | 200,000 | 100,000 |
-| Haiku | 200,000 | 100,000 |
+| Model | Context Window | Default Budget | Custom Budget |
+|-------|---------------|----------------|---------------|
+| Sonnet | 200,000 | 150,000 | — |
+| Opus | 1,000,000 | 750,000 | `--opus Nk` |
+| Haiku | 200,000 | 100,000 | — |
 
-Recon uses Sonnet subagents by default for best capability/cost balance.
+Recon uses Sonnet subagents by default for best capability/cost balance. Use `--opus` for higher quality analysis, with optional custom budget (e.g. `--opus 500k`).
 
 ## Configuration
 

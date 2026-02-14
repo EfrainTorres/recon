@@ -44,6 +44,7 @@ One `/recon` command gives your AI agents permanent context about your codebase.
 Or say "recon my project" and it triggers automatically.
 
 For a full re-scan: `/recon --force`
+For Opus subagents (1M context): `/recon --opus` or `/recon --opus 500k`
 
 **Requirements:** tiktoken (auto-installed with `uv run`, or `pip install tiktoken`)
 
@@ -112,7 +113,7 @@ Recon orchestrates multiple subagents to analyze your codebase in parallel, then
 ## How it Works
 
 1. **Scan:** Runs v2 scanner for file tree, token counts, git stats, entrypoints, duplicates
-2. **Plan:** Splits work across subagents based on token budgets (~150k each)
+2. **Plan:** Splits work across subagents based on token budgets (~150k Sonnet, ~750k Opus)
 3. **Analyze:** Spawns subagents in parallel with enhanced observation prompts
 4. **Synthesize:** Combines subagent reports + scanner metadata into documentation
 
