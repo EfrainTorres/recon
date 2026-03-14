@@ -89,7 +89,7 @@ Before planning subagent work, extract key insights from scanner output:
 
 Divide work among subagents based on scanner output:
 
-**Token budget per subagent:** ~150,000 tokens (safe margin under context limits)
+**Token budget per subagent:** ~750,000 tokens (safe margin under 1M context for Sonnet 4.6 and Opus 4.6)
 
 **Grouping strategy:**
 1. Group files by directory/module (keeps related code together)
@@ -97,7 +97,7 @@ Divide work among subagents based on scanner output:
 3. Exclude generated files from detailed analysis
 4. Prioritize hotspot files for deeper analysis
 
-**For small codebases (<100k tokens):** Still use a single analyzer subagent. You orchestrate, the analyzer reads.
+**For small codebases (<750k tokens):** Still use a single analyzer subagent. You orchestrate, the analyzer reads.
 
 **Example assignment:**
 ```
@@ -187,7 +187,7 @@ Create `docs/RECON_REPORT.md` using this structure:
 ---
 last_mapped: YYYY-MM-DDTHH:MM:SSZ
 scanner_version: 2.0.1
-report_version: 2.2.0
+report_version: 2.4.0
 total_files: N
 total_tokens: N
 coverage:
@@ -440,8 +440,10 @@ When updating an existing map:
 
 | Model | Context Window | Safe Budget per Subagent |
 |-------|---------------|-------------------------|
-| Default | 200,000 | 150,000 |
+| Default | 1,000,000 | 750,000 |
 | Fast | 200,000 | 100,000 |
+
+> **Note:** The "Default" row assumes Sonnet 4.6 or Opus 4.6 (both have 1M context). If Cursor routes to a model with a smaller context window, reduce the budget accordingly. Haiku 4.5 has a 200k context window — use ~100k budget if subagents run on Haiku/Fast.
 
 ## Troubleshooting
 

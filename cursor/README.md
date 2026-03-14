@@ -73,7 +73,7 @@ For a full re-scan (ignoring existing map):
 Recon orchestrates multiple analyzer subagents to map your codebase in parallel:
 
 1. **Scans** - Runs the Python scanner for file tree, token counts, git stats, entrypoints
-2. **Plans** - Splits work across subagents based on token budgets (~150k each)
+2. **Plans** - Splits work across subagents based on token budgets (~750k each)
 3. **Analyzes** - Spawns `recon-analyzer` subagents in parallel to read code
 4. **Synthesizes** - Combines reports into `docs/RECON_REPORT.md`
 

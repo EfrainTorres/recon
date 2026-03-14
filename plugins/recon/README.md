@@ -73,9 +73,9 @@ To force a complete re-analysis (ignoring existing map):
 
 Or say: "remap everything", "full recon scan"
 
-### Opus Mode (1M Context)
+### Opus Mode (Higher Quality)
 
-Use Opus subagents for higher quality analysis:
+Use Opus subagents for higher quality analysis on complex or critical codebases. Opus scores significantly higher on long-context retrieval benchmarks.
 
 ```
 /recon --opus          # Opus subagents at 750k budget (default)
@@ -119,7 +119,7 @@ Just run `/recon` again to update.
 |  2. Plan subagent assignments         |
 |     - Group files by module           |
 |     - Balance token budgets            |
-|       (~150k Sonnet, ~750k Opus)      |
+|       (~750k per subagent)            |
 |     - Prioritize hotspots             |
 |     - Exclude generated files         |
 +---------------------------------------+
@@ -219,11 +219,13 @@ uv run scan-codebase.py . --format compact # Sorted list
 
 | Model | Context Window | Default Budget | Custom Budget |
 |-------|---------------|----------------|---------------|
-| Sonnet | 200,000 | 150,000 | — |
+| Sonnet | 1,000,000 | 750,000 | — |
 | Opus | 1,000,000 | 750,000 | `--opus Nk` |
 | Haiku | 200,000 | 100,000 | — |
 
-Recon uses Sonnet subagents by default for best capability/cost balance. Use `--opus` for higher quality analysis, with optional custom budget (e.g. `--opus 500k`).
+Recon uses Sonnet subagents by default for best capability/cost balance. Both Sonnet 4.6 and Opus 4.6 have 1M context windows. Use `--opus` for higher quality analysis (Opus scores significantly higher on long-context retrieval), with optional custom budget (e.g. `--opus 500k`).
+
+> **Note:** Haiku 4.5 retains a 200k context window. If subagents are overridden to Haiku (e.g. via `CLAUDE_CODE_SUBAGENT_MODEL`), the budget should be reduced to ~100k.
 
 ## Configuration
 

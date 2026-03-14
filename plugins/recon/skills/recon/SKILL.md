@@ -1,6 +1,6 @@
 ---
 name: recon
-description: Maps and documents codebases of any size by orchestrating parallel subagents. Creates docs/RECON_REPORT.md with architecture, health analysis, entrypoints, and actionable recommendations. Updates CLAUDE.md with a summary. Use when user says "recon my project", "recon", "/recon", "scan my project", "document the architecture", "understand this codebase", or when onboarding to a new project. Supports "--force" for full re-scan, "--opus" for Opus subagents (1M context), "--opus Nk" for custom budget (e.g. "--opus 500k").
+description: Maps and documents codebases of any size by orchestrating parallel subagents. Creates docs/RECON_REPORT.md with architecture, health analysis, entrypoints, and actionable recommendations. Updates CLAUDE.md with a summary. Use when user says "recon my project", "recon", "/recon", "scan my project", "document the architecture", "understand this codebase", or when onboarding to a new project. Supports "--force" for full re-scan, "--opus" for higher quality Opus subagents, "--opus Nk" for custom budget (e.g. "--opus 500k").
 ---
 
 # Recon
@@ -24,10 +24,10 @@ Maps codebases of any size using parallel subagents. Produces codebase intellige
 
 First, check for flags in the user's request:
 - `--force` → Full re-map (ignore existing report)
-- `--opus` → Use Opus model for subagents (1M context, 750k default budget)
+- `--opus` → Use Opus model for subagents (higher quality analysis)
 - `--opus Nk` → Opus with custom budget (e.g. `--opus 500k`, `--opus 800k`)
 
-**Default model is Sonnet** — use Opus only when explicitly requested.
+**Default model is Sonnet** — use Opus only when explicitly requested. Both Sonnet 4.6 and Opus 4.6 have 1M context windows; the `--opus` flag is for higher quality analysis, not larger context.
 
 **Budget parsing:** If a number like `500k` or `800k` follows `--opus`, use that as the per-subagent token budget. Otherwise default to 750,000.
 
@@ -95,7 +95,7 @@ Before planning subagent work, extract key insights from scanner output:
 Divide work among subagents based on scanner output:
 
 **Token budget per subagent:**
-- **Sonnet (default):** ~150,000 tokens (safe margin under 200k context)
+- **Sonnet (default):** ~750,000 tokens (safe margin under 1M context)
 - **Opus (`--opus`):** ~750,000 tokens (safe margin under 1M context), or custom `--opus Nk` value
 
 **Grouping strategy:**
@@ -105,7 +105,7 @@ Divide work among subagents based on scanner output:
 4. Prioritize hotspot files for deeper analysis
 
 **For small codebases:** Still use a single subagent. Threshold depends on model:
-- Sonnet: <100k tokens → single subagent
+- Sonnet: <750k tokens → single subagent
 - Opus: <750k tokens (or custom budget) → single subagent
 
 **Example assignment:**
@@ -359,7 +359,7 @@ Create `docs/RECON_REPORT.md` using this structure:
 ---
 last_mapped: YYYY-MM-DDTHH:MM:SSZ
 scanner_version: 2.0.1
-report_version: 2.3.0
+report_version: 2.4.0
 total_files: N
 total_tokens: N
 coverage:
@@ -712,11 +712,13 @@ When updating an existing map:
 
 | Model | Context Window | Default Budget per Subagent | Custom Budget |
 |-------|---------------|---------------------------|---------------|
-| Sonnet | 200,000 | 150,000 | — |
+| Sonnet | 1,000,000 | 750,000 | — |
 | Opus | 1,000,000 | 750,000 | `--opus Nk` (e.g. `--opus 500k`) |
 | Haiku | 200,000 | 100,000 | — |
 
-**Default: Sonnet** — best balance of capability and cost. Use `--opus` flag for higher quality analysis on complex/critical codebases. Use `--opus Nk` to customize the per-subagent budget (e.g. `--opus 400k` for more subagents with smaller context, `--opus 800k` for fewer subagents with larger context).
+**Default: Sonnet** — best balance of capability and cost. Use `--opus` flag for higher quality analysis on complex/critical codebases (Opus scores significantly higher on long-context retrieval benchmarks). Use `--opus Nk` to customize the per-subagent budget (e.g. `--opus 400k` for more subagents with smaller context, `--opus 800k` for fewer subagents with larger context).
+
+> **Note:** Haiku 4.5 retains a 200k context window. If subagents are overridden to Haiku (e.g. via `CLAUDE_CODE_SUBAGENT_MODEL`), the budget should be reduced to ~100k.
 
 ## Scanner Output Reference
 

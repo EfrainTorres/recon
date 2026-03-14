@@ -1,7 +1,7 @@
 ---
 last_mapped: 2026-02-04T03:07:12Z
 scanner_version: 2.0.1
-report_version: 2.3.0
+report_version: 2.4.0
 total_files: 15
 total_tokens: 48076
 coverage:
@@ -202,8 +202,9 @@ No circular dependencies detected.
 - Step-by-step workflow instructions
 
 **Model Selection**:
-- Sonnet: Default for subagents (best cost/capability balance)
-- Opus: Via `--opus` flag for higher quality analysis
+- Sonnet 4.6: Default for subagents (best cost/capability balance, 1M context)
+- Opus 4.6: Via `--opus` flag for higher quality analysis (1M context)
+- Both Sonnet 4.6 and Opus 4.6 use ~750k default budget
 - `model: fast` / `model: inherit` in Cursor agents
 
 ## Gotchas
@@ -221,7 +222,7 @@ No circular dependencies detected.
 - Cursor 2.4.x/2.5 has bug preventing subagent spawning
 
 **Versions**:
-- Scanner version (2.0.1) differs from plugin version (2.3.0)
+- Scanner version (2.0.1) differs from plugin version (2.4.0)
 - Keep `plugin.json` and `marketplace.json` versions in sync
 
 ## Health Summary
@@ -279,7 +280,7 @@ High churn files that may need attention:
 
 **Version numbers**:
 - Scanner: `2.0.1`
-- Plugin/Marketplace: `2.3.0`
+- Plugin/Marketplace: `2.4.0`
 
 ## Suggested First Actions
 
@@ -289,6 +290,6 @@ High churn files that may need attention:
 
 3. **Consolidate LICENSE files** — 3 identical copies (21k tokens total). Keep one at root, symlink or remove others.
 
-4. **Align version numbers** — Scanner 2.0.1 vs Plugin 2.3.0 is confusing. Bump scanner version or document the versioning scheme.
+4. **Align version numbers** — Scanner 2.0.1 vs Plugin 2.4.0 is confusing. Bump scanner version or document the versioning scheme.
 
 5. **Add `--opus` flag to Cursor orchestrator** — Feature parity with Claude Code version.
